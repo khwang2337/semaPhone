@@ -30,7 +30,7 @@ int main(int args, char * argv[]){
 		semid = semget(key, 1, IPC_CREAT | 0644);
 
 		union semun sem;
-		sem.val = 1;
+		sem.val = 3;
 		test = semctl(semid, 0, SETVAL, sem);
 		//printf("%d\n",test );
 
