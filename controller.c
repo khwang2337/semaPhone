@@ -35,8 +35,8 @@ int main(int args, char * argv[]){
 		//printf("%d\n",test );
 
 		fd = open("stories", O_CREAT | O_TRUNC, 0644);
-	} 
-	
+	}
+
 	else if (strcmp(argv[1], "-r") == 0) {
 		shmid = shmget(key, 8, 0);
 		semid = semget(key, 1, 0);
@@ -56,6 +56,6 @@ int main(int args, char * argv[]){
     		fclose(story);
 		}
 	}
-	
+
 	return 0;
 }
