@@ -22,49 +22,28 @@ int main() {
 
 	int* lsize = shmat(shmid, 0, 0); //retrieves size of last entry
 
-
-
 	semb.sem_op = 1; //done reading
 	semop(semid, &semb, 1); //go up
 
 	fd = open("stories", O_RDWR, 0644); //open to read from it
-	printf("here%d\n", *lsize);
 
-	if (*lsize){
-
-		printf("here%d\n", *lsize);
-		lseek(fd, (-1)*(*lsize), SEEK_END); //sets CURR to appropriate spot
-
-		char * buffer = (char *) malloc(1000); //buffer to write into
-		read(fd,buffer,*lsize); //write to buffer
-
-
-		printf("Last entry: %s\n", buffer); //print last entry
-	}else{
-		printf("No previous entry.\n");
+	if ( *lsize ) {
+		lseek(fd, -1 * (*lsize), SEEK_END); //sets CURR to appropriate spot
+		char buffer[50]; //buffer to write into
+		read(fd, buffer, *lsize); //write to buffer
+		//buffer[*lsize - 1] = 0;
+		printf("Last entry: %s", buffer); //print last entry
 	}
-
-	//fd = open("stories", O_RDWR | O_APPEND, 0644);
-	int len = 0; //define length of new entry
-	char canwrite = 0; //boolean for canwrite set to false by default
-	char  * entry = (char *) malloc(1000); //entry array
-	//char * sentry = entry;
-
-
+	else printf("No previous entry.\n");
+	
+	char entry[50]; //
 	fgets(entry, 50, stdin); //while there are still characters in stdin
-		len += strlen(entry) - 1; //increase length
-		//if (! canwrite) { //if cannot write
-			semb.sem_op = -3; //want to down to write
-			semop(semid, &semb, 1); //down to write
-			//canwrite = 1; //boolean canwrite is true
-			lseek(fd, 0, SEEK_END); //set CURR to end, to append
-		//}
-		printf("%s\n", entry);
-		write(fd, entry, strlen(entry) - 1); //write to file
+	*lsize = strlen(entry); //increase length
+	semb.sem_op = -3; //want to down to write
+	semop(semid, &semb, 1); //down to write
+	lseek(fd, 0, SEEK_END); //set CURR to end, to append
+	write(fd, entry, strlen(entry)); //write to file
 
-
-	//}
-	*lsize = len; //edit shared memory to new entry length
 	semb.sem_op = 3; //want to go up entirely
 	semop(semid, &semb, 1); //go up, other processes can now read
 
