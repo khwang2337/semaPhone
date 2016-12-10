@@ -36,17 +36,35 @@ int main(int args, char * argv[]){
 
 		fd = open("stories", O_CREAT | O_TRUNC, 0644);
 	}
+	
+	else if (strcmp(argv[1], "-v") == 0) {
+		fd = open("stories", O_RDONLY , 0644);
+		int character;
+		FILE *story;
+		story = fopen("stories", "r");
+		if (story) {
+    		while ( (character = getc(story)) != EOF ) putchar(character);
+    		fclose(story);
+		}
+	}
 
 	else if (strcmp(argv[1], "-r") == 0) {
 		shmid = shmget(key, 8, 0);
 		semid = semget(key, 1, 0);
+		
+		struct sembuf semb; //set sembuf
+		semb.sem_num = 0;
+		semb.sem_flg = SEM_UNDO;
+		semb.sem_op = -3; //want to remove
+		semop(semid, &semb, 1);
 
 		test = semctl(semid, 0, IPC_RMID);
 		//printf("%d\n", test);
 		struct shmid_ds d;
 		test = shmctl(shmid, IPC_RMID, &d);
 		//printf("%d\n", test);
-
+		
+		
 		fd = open("stories", O_RDONLY , 0644);
 		int character;
 		FILE *story;
